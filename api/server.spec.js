@@ -30,7 +30,7 @@ it("should set db environment to testing", () => {
       return request(server)
       .get('/')
       .then(res => {
-          // expect(res.body).toEqual({ api: 'up' })
+          //expect(res.body).toEqual({ api: 'up' })
           expect(res.body.api).toBe('up')
       })
   })
