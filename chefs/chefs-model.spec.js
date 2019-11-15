@@ -1,5 +1,8 @@
 const db = require('../data/dbConfig')
-const Chefs = require('./chefs-model');
+const { add } = require('./chefs-model');
+const request = require('supertest');
+const server = require('../api/server');
+
 
 describe('chefs model', () => {
     beforeEach(async () => {
@@ -7,17 +10,22 @@ describe('chefs model', () => {
     })
 
 
+
 describe('GET /chefs', () => {
     it('return a status code of 200 OK', async () => {
-        const response = await request(server).get('/chefs')
-        expect(response.status).toBe(200)
+        return request(server).get('/api/chefs').then(res => {
+            expect(res.status).toBe(200)
+        })
     })
+    // it('returns an array of chefs', async () => {
+    //     const response = await request(server).get('chefs')
+    // })
 })
 
 describe('POST /chefs', () => {
     it('should return the provided chef', async () => {
-        await insert({first_name: 'Christopher', last_name: 'Kimball'})
-        await insert({ first_name: 'April', last_name: 'Bloomfield'}) 
+        await add({first_name: 'Christopher', last_name: 'Kimball', company: 'Milk Street'})
+        await add({ first_name: 'April', last_name: 'Bloomfield', company: 'A Girl and her Pig'}) 
 
         const chefs = await db('chefs')
 
@@ -25,16 +33,34 @@ describe('POST /chefs', () => {
         expect(chefs[0].first_name).toBe('Christopher')
         expect(chefs[1].first_name).toBe('April')
     })
+    it('should return a status code of 201', () => {
+        return request(server).post('/api/chefs')
+        .send({ first_name: 'Christopher', last_name: 'Kimball', company: 'Milk Street'})
+        .then(res => {
+            expect(res.type).toMatch(/json/i)
+            expect(res.status).toEqual(201)
+        })
+    })
 })
 
 describe('DELETE /chefs/:id', () => {
     it('returns a status code 200 OK after deleted', async () => {
-        const body = { first_name: 'test', last_name: 'test'}
-        await Chefs.add(body);
+        await request(server).post('/api/chefs')
+        .send({ first_name: 'Christopher', last_name: 'Kimball', company: 'Milk Street'})
 
-        return request(server).delete('/chefs/1').then(res => {
-            expect(res.status).toBe(200)
+        const res = await request(server).del('/api/chefs/1')
+
+        expect(res.type).toMatch(/json/i);
+        expect(res.status).toEqual(200);
+
         })
+    // it('should return "1" if deletion was successful', async () => {
+    //     await request(server).post('/api/chefs')
+    //         .send('1')
+
+    //         const res = await request(server).del('/api/chefs/1')
+
+    //         expect(res).toBe('1')
+    // })
     })
-})
 })
