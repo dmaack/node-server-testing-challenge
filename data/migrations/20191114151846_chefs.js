@@ -4,10 +4,10 @@ exports.up = function(knex) {
       tbl.increments();
 
       tbl
-        .string('first name', 128)
+        .string('first_name', 128)
         .notNullable();
     tbl
-        .string('last name', 128)
+        .string('last_name', 128)
         .notNullable();
     tbl
         .string('company', 128)
